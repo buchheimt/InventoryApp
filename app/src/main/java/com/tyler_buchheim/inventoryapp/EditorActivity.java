@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -75,6 +76,36 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mDescriptionEditText.setOnTouchListener(mTouchListener);
         mSupplierNameEditText.setOnTouchListener(mTouchListener);
         mSupplierEmailEditText.setOnTouchListener(mTouchListener);
+
+        Button decreaseButton = findViewById(R.id.decrease_quantity);
+        Button increaseButton = findViewById(R.id.increase_quantity);
+
+        decreaseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                modifyQuantity(-1);
+                mProductHasChanged = true;
+            }
+        });
+
+        increaseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                modifyQuantity(1);
+                mProductHasChanged = true;
+            }
+        });
+    }
+
+    private void modifyQuantity(int change) {
+        String prevString = mQuantityEditText.getText().toString();
+        Log.e("hih", "PREVSTRING:" + prevString);
+        if (!prevString.isEmpty()) {
+            int newQuantity =  Integer.parseInt(prevString) + change;
+            if (newQuantity >= 0) {
+                mQuantityEditText.setText(String.valueOf(newQuantity));
+            }
+        }
     }
 
     // Menu methods
