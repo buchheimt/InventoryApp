@@ -52,6 +52,7 @@ public class ProductProvider extends ContentProvider {
                 break;
             case PRODUCT_ID:
                 selection = ProductEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
                 cursor = db.query(ProductEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;

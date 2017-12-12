@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Inventory App</string>
+    <string name="editor_activity_title_new_product">New Product</string>
+    <string name="editor_activity_title_edit_product">Edit Product</string>
+    <string name="action_save">Save</string>
+    <string name="action_order">Order More</string>
+    <string name="action_delete">Delete</string>
+    <string name="unsaved_changes_confirmation">Discard changes and return to Catalog?</string>
+    <string name="discard_changes">Discard Changes</string>
+    <string name="continue_editing">Continue Editing</string>
+    <string name="delete_confirmation">Delete this product?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="insert_failed">There was an error creating this product</string>
+    <string name="insert_success">Product successfully created!</string>
+    <string name="update_failed">There was an error updating this product</string>
+    <string name="update_success">Product successfully updated</string>
+    <string name="delete_failed">There was an error deleting this product</string>
+    <string name="delete_success">Product successfully deleted</string>
 </resources>
