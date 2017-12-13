@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tyler_buchheim.inventoryapp">
 
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/launcher_icon"

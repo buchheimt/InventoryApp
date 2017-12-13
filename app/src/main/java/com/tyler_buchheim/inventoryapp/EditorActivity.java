@@ -106,6 +106,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
                 startActivityForResult(intent, IMAGE_REQUEST_CODE);
             }
         });
@@ -121,6 +122,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     return;
                 }
                 Uri uri = resultIntent.getData();
+                final int flags = resultIntent.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
+                getContentResolver().takePersistableUriPermission(uri, flags);
                 mImageView.setImageURI(uri);
                 mImageUri = String.valueOf(uri);
             }
@@ -149,8 +152,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (mCurrentProductUri == null) {
-            MenuItem menuItem = menu.findItem(R.id.action_delete);
-            menuItem.setVisible(false);
+            MenuItem deleteItem = menu.findItem(R.id.action_delete);
+            MenuItem orderItem = menu.findItem(R.id.action_order);
+            deleteItem.setVisible(false);
+            orderItem.setVisible(false);
         }
         return true;
     }
