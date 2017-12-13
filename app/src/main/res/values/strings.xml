@@ -1,5 +1,16 @@
 <resources>
     <string name="app_name">Inventory App</string>
+    <string name="overview">Overview</string>
+    <string name="name">Name</string>
+    <string name="currency">$</string>
+    <string name="price">(Price)</string>
+    <string name="quantity_symbol">x </string>
+    <string name="quantity">(Quantity)</string>
+    <string name="minus">-</string>
+    <string name="plus">+</string>
+    <string name="supplier">Supplier</string>
+    <string name="supplier_name">Supplier Name</string>
+    <string name="supplier_email">Supplier Email</string>
     <string name="editor_activity_title_new_product">New Product</string>
     <string name="editor_activity_title_edit_product">Edit Product</string>
     <string name="empty">No products to display yet, click the add button to get started!</string>
@@ -29,4 +40,6 @@
     <string name="supplier_email_empty">Supplier email is required</string>
     <string name="image_failed">There was an error loading the image</string>
     <string name="image_empty">Image is required</string>
+    <string name="select_image">Select Image</string>
+    <string name="no_info">No information detected</string>
 </resources>

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,11 +22,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.tyler_buchheim.inventoryapp.data.ProductContract;
-import com.tyler_buchheim.inventoryapp.data.ProductContract.ProductEntry;
-
-import java.io.FileNotFoundException;
 import java.util.Locale;
+
+import com.tyler_buchheim.inventoryapp.data.ProductContract.ProductEntry;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -133,7 +130,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private void modifyQuantity(int change) {
         String prevString = mQuantityEditText.getText().toString();
         if (!prevString.isEmpty()) {
-            int newQuantity =  Integer.parseInt(prevString) + change;
+            int newQuantity = Integer.parseInt(prevString) + change;
             if (newQuantity >= 0) {
                 mQuantityEditText.setText(String.valueOf(newQuantity));
             }
@@ -201,7 +198,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     public void onBackPressed() {
         if (!mProductHasChanged) {
             super.onBackPressed();
-            return;
         }
     }
 
@@ -251,13 +247,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String supplierNameString = mSupplierNameEditText.getText().toString().trim();
         String supplierEmailString = mSupplierEmailEditText.getText().toString().trim();
 
-        int price = (int) (Double.parseDouble(priceString) * 100);
-
-        int quantity = Integer.parseInt(quantityString);
-
         if (mCurrentProductUri == null && nameString.isEmpty() && priceString.isEmpty() &&
                 quantityString.isEmpty() && supplierNameString.isEmpty() &&
-                supplierEmailString.isEmpty() && mImageUri.isEmpty()) {
+                supplierEmailString.isEmpty() && mImageUri == null) {
+            Toast.makeText(this, getString(R.string.no_info), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -267,12 +260,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return;
         }
 
-        if (priceString.isEmpty() || price < 0) {
+        if (priceString.isEmpty()) {
+            Toast.makeText(this, getString(R.string.invalid_price), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int price = (int) (Double.parseDouble(priceString) * 100);
+        if (price < 0) {
             Toast.makeText(this, getString(R.string.invalid_price), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (quantityString.isEmpty() || quantity < 0) {
+        if (quantityString.isEmpty()) {
+            Toast.makeText(this, getString(R.string.invalid_quantity), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int quantity = Integer.parseInt(quantityString);
+        if (quantity < 0) {
             Toast.makeText(this, getString(R.string.invalid_quantity), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -287,12 +290,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return;
         }
 
-        if (mImageUri.isEmpty()) {
+        if (mImageUri == null) {
             Toast.makeText(this, getString(R.string.image_empty), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Log.e("wha", "again: " + mImageUri);
         ContentValues values = new ContentValues();
         values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
         values.put(ProductEntry.COLUMN_PRODUCT_PRICE, price);
@@ -315,7 +317,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 Toast.makeText(this, getString(R.string.update_failed), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, getString(R.string.update_success), Toast.LENGTH_SHORT).show();
-                Log.e("LOL", "thiing:" + mImageUri);
                 finish();
             }
         }
@@ -328,10 +329,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 Toast.makeText(this, getString(R.string.delete_failed), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, getString(R.string.delete_success), Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
-
-        finish();
     }
 
     // CursorLoader methods
@@ -354,7 +354,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 null,                           // Columns of WHERE clause
                 null,                           // Values of WHERE clause
                 null);                          // Default sort order
-
     }
 
     @Override
@@ -399,6 +398,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mSupplierNameEditText.setText("");
         mSupplierEmailEditText.setText("");
         mImageView.setImageURI(null);
-        mImageUri = "";
+        mImageUri = null;
     }
 }

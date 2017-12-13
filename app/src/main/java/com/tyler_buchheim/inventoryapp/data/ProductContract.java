@@ -6,7 +6,8 @@ import android.provider.BaseColumns;
 
 public final class ProductContract {
 
-    private ProductContract() {}
+    private ProductContract() {
+    }
 
     public static final String CONTENT_AUTHORITY = "com.tyler_buchheim.inventoryapp";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);

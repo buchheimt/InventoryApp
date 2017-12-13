@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.widget.Toast;
 
 import com.tyler_buchheim.inventoryapp.data.ProductContract.ProductEntry;
 
-import java.net.URI;
 import java.util.Locale;
 
 public class ProductCursorAdapter extends CursorAdapter {
@@ -31,7 +29,6 @@ public class ProductCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
-        //TODO Add price, quantity, and picture to list item xml and implement here
 
         TextView nameTextView = view.findViewById(R.id.name);
         TextView priceTextView = view.findViewById(R.id.price);
