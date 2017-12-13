@@ -26,7 +26,6 @@ public final class ProductContract {
         public static final String COLUMN_PRODUCT_NAME = "name";
         public static final String COLUMN_PRODUCT_PRICE = "price";
         public static final String COLUMN_PRODUCT_QUANTITY = "quantity";
-        public static final String COLUMN_PRODUCT_DESCRIPTION = "description";
         public static final String COLUMN_PRODUCT_SUPPLIER_NAME = "supplier_name";
         public static final String COLUMN_PRODUCT_SUPPLIER_EMAIL = "supplier_email";
         public static final String COLUMN_PRODUCT_IMAGE = "image";

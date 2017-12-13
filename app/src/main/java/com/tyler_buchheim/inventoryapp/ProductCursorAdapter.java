@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.tyler_buchheim.inventoryapp.data.ProductContract.ProductEntry;
 
 import java.net.URI;
+import java.util.Locale;
 
 public class ProductCursorAdapter extends CursorAdapter {
 
@@ -43,12 +44,13 @@ public class ProductCursorAdapter extends CursorAdapter {
 
         int id = cursor.getInt(idColumnIndex);
         String name = cursor.getString(nameColumnIndex);
-        String price = cursor.getString(priceColumnIndex);
+        final double price = cursor.getDouble(priceColumnIndex) / 100;
+        String priceString = "$" + String.format(Locale.US, "%.2f", price);
         final int quantity = cursor.getInt(quantityColumnIndex);
         String quantityString = "x " + String.valueOf(quantity);
 
         nameTextView.setText(name);
-        priceTextView.setText("$" + price);
+        priceTextView.setText(priceString);
         quantityTextView.setText(quantityString);
 
         final Uri uri = Uri.parse(ProductEntry.CONTENT_URI + "/" + id);

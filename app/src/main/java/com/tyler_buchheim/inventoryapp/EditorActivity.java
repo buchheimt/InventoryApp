@@ -1,5 +1,6 @@
 package com.tyler_buchheim.inventoryapp;
 
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
@@ -19,23 +20,28 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.tyler_buchheim.inventoryapp.data.ProductContract;
 import com.tyler_buchheim.inventoryapp.data.ProductContract.ProductEntry;
 
+import java.io.FileNotFoundException;
+import java.util.Locale;
+
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EXISTING_PRODUCT_LOADER = 0;
     private Uri mCurrentProductUri;
+    private final int IMAGE_REQUEST_CODE = 1;
 
-    //TODO Add remaining edit fields and handle in onCreate
     private EditText mNameEditText;
     private EditText mPriceEditText;
     private EditText mQuantityEditText;
-    private EditText mDescriptionEditText;
     private EditText mSupplierNameEditText;
     private EditText mSupplierEmailEditText;
+    private ImageView mImageView;
+    private String mImageUri;
 
     private boolean mProductHasChanged = false;
 
@@ -66,21 +72,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mNameEditText = findViewById(R.id.edit_name);
         mPriceEditText = findViewById(R.id.edit_price);
         mQuantityEditText = findViewById(R.id.edit_quantity);
-        mDescriptionEditText = findViewById(R.id.edit_description);
         mSupplierNameEditText = findViewById(R.id.edit_supplier_name);
         mSupplierEmailEditText = findViewById(R.id.edit_supplier_email);
+        mImageView = findViewById(R.id.image);
 
         mNameEditText.setOnTouchListener(mTouchListener);
         mPriceEditText.setOnTouchListener(mTouchListener);
         mQuantityEditText.setOnTouchListener(mTouchListener);
-        mDescriptionEditText.setOnTouchListener(mTouchListener);
         mSupplierNameEditText.setOnTouchListener(mTouchListener);
         mSupplierEmailEditText.setOnTouchListener(mTouchListener);
+        mImageView.setOnTouchListener(mTouchListener);
 
-        Button decreaseButton = findViewById(R.id.decrease_quantity);
-        Button increaseButton = findViewById(R.id.increase_quantity);
+        Button decreaseBtn = findViewById(R.id.decrease_quantity);
+        Button increaseBtn = findViewById(R.id.increase_quantity);
+        Button selectImageButton = findViewById(R.id.select_image);
 
-        decreaseButton.setOnClickListener(new View.OnClickListener() {
+        decreaseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 modifyQuantity(-1);
@@ -88,18 +95,43 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         });
 
-        increaseButton.setOnClickListener(new View.OnClickListener() {
+        increaseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 modifyQuantity(1);
                 mProductHasChanged = true;
             }
         });
+
+        selectImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                startActivityForResult(intent, IMAGE_REQUEST_CODE);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+        super.onActivityResult(requestCode, resultCode, resultIntent);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == IMAGE_REQUEST_CODE) {
+                if (resultIntent == null) {
+                    return;
+                }
+                Uri uri = resultIntent.getData();
+                mImageView.setImageURI(uri);
+                mImageUri = String.valueOf(uri);
+            }
+        }
     }
 
     private void modifyQuantity(int change) {
         String prevString = mQuantityEditText.getText().toString();
-        Log.e("hih", "PREVSTRING:" + prevString);
         if (!prevString.isEmpty()) {
             int newQuantity =  Integer.parseInt(prevString) + change;
             if (newQuantity >= 0) {
@@ -131,11 +163,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         switch (item.getItemId()) {
             case R.id.action_save:
                 saveProduct();
-                finish();
                 return true;
             case R.id.action_order:
                 order();
-                finish();
                 return true;
             case R.id.action_delete:
                 showDeleteConfirmationDialog();
@@ -218,27 +248,58 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String nameString = mNameEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
-        String descriptionString = mDescriptionEditText.getText().toString().trim();
-
         String supplierNameString = mSupplierNameEditText.getText().toString().trim();
         String supplierEmailString = mSupplierEmailEditText.getText().toString().trim();
-        //TODO Implement actual image handling
-        String imageString = "IMAGE!";
+
+        int price = (int) (Double.parseDouble(priceString) * 100);
+
+        int quantity = Integer.parseInt(quantityString);
 
         if (mCurrentProductUri == null && nameString.isEmpty() && priceString.isEmpty() &&
-                quantityString.isEmpty() && descriptionString.isEmpty() &&
-                supplierNameString.isEmpty() && supplierEmailString.isEmpty() && imageString.isEmpty()) {
+                quantityString.isEmpty() && supplierNameString.isEmpty() &&
+                supplierEmailString.isEmpty() && mImageUri.isEmpty()) {
             return;
         }
 
+        // input validations
+        if (nameString.isEmpty()) {
+            Toast.makeText(this, getString(R.string.name_empty), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (priceString.isEmpty() || price < 0) {
+            Toast.makeText(this, getString(R.string.invalid_price), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (quantityString.isEmpty() || quantity < 0) {
+            Toast.makeText(this, getString(R.string.invalid_quantity), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (supplierNameString.isEmpty()) {
+            Toast.makeText(this, getString(R.string.supplier_name_empty), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (supplierEmailString.isEmpty()) {
+            Toast.makeText(this, getString(R.string.supplier_email_empty), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (mImageUri.isEmpty()) {
+            Toast.makeText(this, getString(R.string.image_empty), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.e("wha", "again: " + mImageUri);
         ContentValues values = new ContentValues();
         values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
-        values.put(ProductEntry.COLUMN_PRODUCT_PRICE, Integer.parseInt(priceString));
-        values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, Integer.parseInt(quantityString));
-        values.put(ProductEntry.COLUMN_PRODUCT_DESCRIPTION, descriptionString);
+        values.put(ProductEntry.COLUMN_PRODUCT_PRICE, price);
+        values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
         values.put(ProductEntry.COLUMN_PRODUCT_SUPPLIER_NAME, supplierNameString);
         values.put(ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL, supplierEmailString);
-        values.put(ProductEntry.COLUMN_PRODUCT_IMAGE, imageString);
+        values.put(ProductEntry.COLUMN_PRODUCT_IMAGE, mImageUri);
 
         if (mCurrentProductUri == null) {
             Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
@@ -246,6 +307,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 Toast.makeText(this, getString(R.string.insert_failed), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, getString(R.string.insert_success), Toast.LENGTH_SHORT).show();
+                finish();
             }
         } else {
             int rowsAffected = getContentResolver().update(mCurrentProductUri, values, null, null);
@@ -253,6 +315,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 Toast.makeText(this, getString(R.string.update_failed), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, getString(R.string.update_success), Toast.LENGTH_SHORT).show();
+                Log.e("LOL", "thiing:" + mImageUri);
+                finish();
             }
         }
     }
@@ -279,7 +343,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 ProductEntry.COLUMN_PRODUCT_NAME,
                 ProductEntry.COLUMN_PRODUCT_PRICE,
                 ProductEntry.COLUMN_PRODUCT_QUANTITY,
-                ProductEntry.COLUMN_PRODUCT_DESCRIPTION,
                 ProductEntry.COLUMN_PRODUCT_SUPPLIER_NAME,
                 ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL,
                 ProductEntry.COLUMN_PRODUCT_IMAGE
@@ -304,29 +367,27 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             int nameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME);
             int priceColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE);
             int quantityColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY);
-            int descriptionColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_DESCRIPTION);
             int supplierNameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER_NAME);
             int supplierEmailColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL);
             int imageColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_IMAGE);
 
             String name = cursor.getString(nameColumnIndex);
-            int price = cursor.getInt(priceColumnIndex);
+            double price = cursor.getDouble(priceColumnIndex) / 100;
             int quantity = cursor.getInt(quantityColumnIndex);
-            String description = cursor.getString(descriptionColumnIndex);
             String supplierName = cursor.getString(supplierNameColumnIndex);
             String supplierEmail = cursor.getString(supplierEmailColumnIndex);
-            String image = cursor.getString(imageColumnIndex);
+            String imageUri = cursor.getString(imageColumnIndex);
 
-            String priceString = Integer.toString(price);
+            String priceString = String.format(Locale.US, "%.2f", price);
             String quantityString = Integer.toString(quantity);
 
             mNameEditText.setText(name);
             mPriceEditText.setText(priceString);
             mQuantityEditText.setText(quantityString);
-            mDescriptionEditText.setText(description);
             mSupplierNameEditText.setText(supplierName);
             mSupplierEmailEditText.setText(supplierEmail);
-            //TODO implement real image handling
+            mImageUri = imageUri;
+            mImageView.setImageURI(Uri.parse(imageUri));
         }
     }
 
@@ -335,9 +396,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mNameEditText.setText("");
         mPriceEditText.setText("");
         mQuantityEditText.setText("");
-        mDescriptionEditText.setText("");
         mSupplierNameEditText.setText("");
         mSupplierEmailEditText.setText("");
-        //TODO add image to resets
+        mImageView.setImageURI(null);
+        mImageUri = "";
     }
 }

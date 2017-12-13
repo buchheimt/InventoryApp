@@ -22,4 +22,11 @@
     <string name="sale_success">Sale was successful!</string>
     <string name="sale_error">There was an error recording this sale</string>
     <string name="sale_fail">Insufficient inventory to complete sale</string>
+    <string name="name_empty">Product name is required</string>
+    <string name="invalid_price">Price cannot be empty or negative</string>
+    <string name="invalid_quantity">Quantity cannot be empty or negative</string>
+    <string name="supplier_name_empty">Supplier name is required</string>
+    <string name="supplier_email_empty">Supplier email is required</string>
+    <string name="image_failed">There was an error loading the image</string>
+    <string name="image_empty">Image is required</string>
 </resources>

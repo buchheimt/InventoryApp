@@ -24,7 +24,6 @@ public class ProductDbHelper extends SQLiteOpenHelper {
                 + ProductEntry.COLUMN_PRODUCT_NAME + " TEXT NOT NULL, "
                 + ProductEntry.COLUMN_PRODUCT_PRICE + " INTEGER NOT NULL, "
                 + ProductEntry.COLUMN_PRODUCT_QUANTITY + " INTEGER NOT NULL DEFAULT 0, "
-                + ProductEntry.COLUMN_PRODUCT_DESCRIPTION + " TEXT, "
                 + ProductEntry.COLUMN_PRODUCT_SUPPLIER_NAME + " TEXT NOT NULL, "
                 + ProductEntry.COLUMN_PRODUCT_SUPPLIER_EMAIL + " TEXT NOT NULL, "
                 + ProductEntry.COLUMN_PRODUCT_IMAGE + " TEXT NOT NULL);";

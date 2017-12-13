@@ -91,7 +91,6 @@ public class ProductProvider extends ContentProvider {
     }
 
     private Uri insertProduct(Uri uri, ContentValues values) {
-        //TODO Add validation checks to data
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -121,7 +120,6 @@ public class ProductProvider extends ContentProvider {
     }
 
     private int updateProduct(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        //TODO Add validation checks to data
 
         // Don't hit DB if there are no values to update
         if (values.size() == 0) {
